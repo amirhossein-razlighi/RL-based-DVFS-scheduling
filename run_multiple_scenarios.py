@@ -74,7 +74,7 @@ def evaluate_scenario(num_cores: int, util_per_core: float):
 
     try:
         tasks = generate_periodic_tasks(
-            n=100,
+            n=30,
             total_utilization=total_util,
         )
 
@@ -127,8 +127,7 @@ def evaluate_scenario(num_cores: int, util_per_core: float):
 
 
 def main():
-    # scenarios = {"cores": [8, 16, 32], "utils": [0.25, 0.5, 0.75, 1.0]}
-    scenarios = {"cores": [8, 16], "utils": [1.0]}
+    scenarios = {"cores": [8, 16, 32], "utils": [0.25, 0.5, 0.75, 1.0]}
 
     results = {}
     for cores in scenarios["cores"]:
