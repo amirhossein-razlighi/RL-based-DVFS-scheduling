@@ -1,0 +1,7 @@
+stable_baselines3 
+gymnasium
+gym
+numpy
+pandas
+matplotlib
+torch
