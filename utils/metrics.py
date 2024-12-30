@@ -18,8 +18,7 @@ def calculate_qos_system(
 
 
 def plot_system_metrics(env, episode_data: Dict, name: str = "System Metrics"):
-    """Plot system metrics over time with optimized legends"""
-    # Create larger figure for better layout when many cores
+    """Plot system metrics over time"""
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
 
     # QoS per task
@@ -32,7 +31,7 @@ def plot_system_metrics(env, episode_data: Dict, name: str = "System Metrics"):
     ax1.set_xlabel("Task ID")
     ax1.set_ylabel("QoS")
 
-    # Power consumption per core with optimized legend
+    # Power consumption per core
     times = range(len(episode_data["powers"]))
     lines = []
     for core in range(env.num_cores):
@@ -45,7 +44,7 @@ def plot_system_metrics(env, episode_data: Dict, name: str = "System Metrics"):
     ax2.set_xlabel("Time Step")
     ax2.set_ylabel("Power (W)")
 
-    # Temperature profile with optimized legend
+    # Temperature profile
     temp_lines = []
     for core in range(env.num_cores):
         line = ax3.plot(
@@ -67,7 +66,6 @@ def plot_system_metrics(env, episode_data: Dict, name: str = "System Metrics"):
     ax4.set_xlabel("Core ID")
     ax4.set_ylabel("Utilization")
 
-    # Optimize legends based on number of cores
     if env.num_cores > 16:
         # Move legends outside with multiple columns
         ax2.legend(

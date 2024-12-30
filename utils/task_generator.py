@@ -8,7 +8,6 @@ def generate_power_profile() -> Dict[float, float]:
     Generate power profile for different voltage levels
     Returns voltage->power mapping
     """
-    # Based on P = αCV²f + Pstatic
     # Values chosen from typical mobile processor characteristics
     return {
         0.8: 0.5,  # Low voltage -> ~0.5W
@@ -90,7 +89,7 @@ def generate_periodic_tasks(
 
 
 def test_task_generation():
-    # Generate multiple task sets
+    # Generate multiple task sets with different utilizations
     for util in [0.4, 0.6, 0.8]:
         tasks = generate_periodic_tasks(n=10, total_utilization=util)
         print(f"\nTest with utilization {util}:")

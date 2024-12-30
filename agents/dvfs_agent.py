@@ -40,7 +40,6 @@ class EarlyStopCallback(BaseCallback):
 def train_dvfs_agent(
     env: DVFSEnvironment, steps: int = 200_000, checkpoint_callback=None
 ):
-    """Enhanced training configuration"""
     model = PPO(
         "MlpPolicy",
         env,

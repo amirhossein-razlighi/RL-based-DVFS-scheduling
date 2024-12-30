@@ -35,7 +35,7 @@ def collect_episode_data(env, agent):
     done = False
     episode_data = {"powers": [], "temperatures": [], "utils": [], "assignments": []}
 
-    # Track all 50 tasks
+    # Track all tasks
     while not done and len(episode_data["assignments"]) < len(env.tasks):
         action, _ = agent.predict(obs, deterministic=True)
         obs, reward, done, _, info = env.step(action)

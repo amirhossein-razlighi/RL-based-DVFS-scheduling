@@ -4,3 +4,4 @@ results/
 checkpoints/
 logs/
 data/
+*.pdf

@@ -99,7 +99,6 @@ def plot_timeline(tasks: List[Task], enumerator: int = 0):
                     linewidth=1,
                 )
 
-        # Customize plot
         plt.grid(True, alpha=0.3)
         plt.title(f"Task Timeline (up to time: {hyperperiod:.1f})")
         plt.xlabel("Time")

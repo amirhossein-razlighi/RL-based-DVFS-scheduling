@@ -27,10 +27,8 @@ class DVFSEnvironment(gym.Env):
         num_vf_pairs = len(config.VF_PAIRS)
         self.action_space = gym.spaces.Discrete(self.num_cores * num_vf_pairs)
 
-        # State space: [core_utils, core_temps, core_freqs, task_utils]
-        obs_dim = (
-            3 * self.num_cores
-        ) + 3  # cores_utils + normalized_distance + temps + task_info
+        # State space: [core_utils, normalized_distance (to target), core_temps, task_info]
+        obs_dim = (3 * self.num_cores) + 3
         self.observation_space = gym.spaces.Box(
             low=0, high=1, shape=(obs_dim,), dtype=np.float32
         )
@@ -68,7 +66,6 @@ class DVFSEnvironment(gym.Env):
         }
 
     def step(self, action):
-        # Log initial state
         if self.current_task_idx >= len(self.tasks):
             print(
                 f"Completed assignments: {sum(1 for x in self.core_assignments if x is not None)}/{len(self.tasks)}"
@@ -94,10 +91,10 @@ class DVFSEnvironment(gym.Env):
             if predicted_util <= 1.0:
                 break
         else:
-            # No valid core found - end episode with failure
+            # No valid core found - end episode with failure (large penalty = -10)
             return self._get_state(), -10.0, True, False, self._get_info()
 
-        # Get V-F pair
+        # Voltage-Frequency pair
         v, f = list(self.config.VF_PAIRS.items())[vf_idx]
 
         # Assign task
@@ -106,7 +103,7 @@ class DVFSEnvironment(gym.Env):
         current_task.assigned_core = core_id
         current_task.assigned_frequency = f
 
-        # Update metrics with strict validation
+        # Update metrics
         self.core_utils = np.zeros(self.num_cores)
         self.core_powers = np.zeros(self.num_cores)
 
@@ -172,7 +169,6 @@ class DVFSEnvironment(gym.Env):
         ).astype(np.float32)
 
     def _calculate_step_reward(self, core_temps, current_freq):
-        """Improved hierarchical reward calculation"""
         reward = 0.0
 
         # 1. Critical Constraints (-10 to 0)
@@ -253,26 +249,26 @@ class DVFSEnvironment(gym.Env):
             util_balance + power_efficiency + temp_management + 10.0
         )  # Bonus for feasible solution
 
-    def _calculate_reward(
-        self, vf_pairs: List[Tuple[float, float]], power: float
-    ) -> float:
-        """Normalized reward function"""
-        # Large penalty for overheating
-        if self.thermal_model.temperature >= self.config.MAX_TEMPERATURE:
-            return -10.0
+    # def _calculate_reward(
+    #     self, vf_pairs: List[Tuple[float, float]], power: float
+    # ) -> float:
+    #     """Normalized reward function"""
+    #     # Large penalty for overheating
+    #     if self.thermal_model.temperature >= self.config.MAX_TEMPERATURE:
+    #         return -10.0
 
-        # Temperature penalty (exponential)
-        temp_norm = (self.thermal_model.temperature - self.config.AMBIENT_TEMP) / (
-            self.config.MAX_TEMPERATURE - self.config.AMBIENT_TEMP
-        )
-        temp_penalty = -np.exp(4 * temp_norm)
+    #     # Temperature penalty (exponential)
+    #     temp_norm = (self.thermal_model.temperature - self.config.AMBIENT_TEMP) / (
+    #         self.config.MAX_TEMPERATURE - self.config.AMBIENT_TEMP
+    #     )
+    #     temp_penalty = -np.exp(4 * temp_norm)
 
-        # Power efficiency (-1 to 0)
-        power_reward = -power / self.config.MAX_POWER
+    #     # Power efficiency (-1 to 0)
+    #     power_reward = -power / self.config.MAX_POWER
 
-        # Performance (0 to 1)
-        perf_reward = np.mean([f for _, f in vf_pairs]) / max(
-            f for _, f in self.config.VF_PAIRS.items()
-        )
+    #     # Performance (0 to 1)
+    #     perf_reward = np.mean([f for _, f in vf_pairs]) / max(
+    #         f for _, f in self.config.VF_PAIRS.items()
+    #     )
 
-        return 0.4 * power_reward + 0.4 * perf_reward + 0.2 * temp_penalty
+    #     return 0.4 * power_reward + 0.4 * perf_reward + 0.2 * temp_penalty
