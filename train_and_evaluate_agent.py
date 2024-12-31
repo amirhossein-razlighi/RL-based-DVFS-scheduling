@@ -43,7 +43,7 @@ def evaluate_agent(env: DVFSEnvironment, agent, num_episodes: int = 5):
 
 def main():
     SEED = 42
-    tasks = generate_periodic_tasks(n=50, total_utilization=0.7 * 4)  # Adjust for cores
+    tasks = generate_periodic_tasks(n=50, total_utilization=0.7 * 4)
     config = DVFSConfig(NUM_CORES=4)
     env = DVFSEnvironment(tasks, config)
 
