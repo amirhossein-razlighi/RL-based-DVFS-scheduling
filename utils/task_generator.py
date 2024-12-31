@@ -13,7 +13,7 @@ def generate_power_profile() -> Dict[float, float]:
         0.8: 0.5,  # Low voltage -> ~0.5W
         1.0: 1.0,  # Nominal -> ~1W
         1.2: 2.0,  # High voltage -> ~2W
-    }
+    } 
 
 
 def uunifast(n: int, total_util: float) -> List[float]:
