@@ -5,3 +5,4 @@ checkpoints/
 logs/
 data/
 *.pdf
+hybrid_results/
