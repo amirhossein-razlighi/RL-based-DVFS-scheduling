@@ -40,12 +40,18 @@ class OnlineScheduler:
         if task.id in self.accepted_task_ids:
             return None
 
-        # Try each core with its own TBS
+        # Sort cores by current utilization
+        cores_by_load = sorted(
+            range(self.config.NUM_CORES), key=lambda x: self.core_utils[x]
+        )
+
+        # Try each core in order of least loaded
         best_core = None
         best_deadline = float("inf")
         best_freq = None
+        min_util_increase = float("inf")
 
-        for core in range(self.config.NUM_CORES):
+        for core in cores_by_load:
             if self.tbs_capacities[core] <= 0:
                 continue
 
@@ -58,22 +64,32 @@ class OnlineScheduler:
                 scaled_exec = task.execution_time / f
                 task_util = scaled_exec / (deadline - task.arrival_time)
 
+                # Calculate impact on core
+                total_util = self.core_utils[core] + task_util
+
                 if (
-                    self.core_utils[core] + task_util <= 1.0
+                    total_util <= 1.0
                     and scaled_exec <= deadline - task.arrival_time
-                    and deadline < best_deadline
+                    and task_util < min_util_increase
                 ):
                     best_core = core
                     best_deadline = deadline
                     best_freq = f
+                    min_util_increase = task_util
+
+                    # Early exit if we find a good solution
+                    if total_util < 0.8:  # Leave room for future tasks
+                        break
+
+            # Early exit if we found a good core
+            if best_core is not None and min_util_increase < 0.3:
+                break
 
         if best_core is not None:
             task.assigned_core = best_core
             task.assigned_frequency = best_freq
             task.soft_deadline = best_deadline
-            self.core_utils[best_core] += task.execution_time / (
-                best_freq * (best_deadline - task.arrival_time)
-            )
+            self.core_utils[best_core] += min_util_increase
             self.active_tasks.append(task)
             self.accepted_task_ids.add(task.id)
             return best_deadline

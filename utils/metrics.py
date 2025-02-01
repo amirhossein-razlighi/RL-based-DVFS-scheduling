@@ -6,6 +6,7 @@ from models import Task
 from models.aperiodic_task import AperiodicTask
 import os
 
+
 def calculate_qos_task(task: Task, assigned_freq: float, max_freq: float) -> float:
     """Calculate QoS for single task"""
     return assigned_freq / max_freq
@@ -145,8 +146,8 @@ def plot_aperiodic_metrics(
     name: str = "Aperiodic_Metrics",
     path: str = "hybrid_results",
 ):
-    """Plot metrics including core/frequency assignments"""
-    fig, ((ax1, ax2), (ax3, ax4), (ax5, ax6)) = plt.subplots(3, 2, figsize=(16, 18))
+    """Plot metrics including frequency assignments"""
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
 
     # Response Time Distribution
     response_times = [(t.soft_deadline - t.arrival_time) for t in accepted_tasks]
@@ -177,29 +178,12 @@ def plot_aperiodic_metrics(
     ax3.set_ylabel("QoS")
     ax3.legend()
 
-    # Task Importance vs Response Time
-    ax4.scatter(
-        [t.importance for t in accepted_tasks],
-        [(t.soft_deadline - t.arrival_time) for t in accepted_tasks],
-        alpha=0.5,
-    )
-    ax4.set_title("Importance vs Response Time")
-    ax4.set_xlabel("Task Importance")
-    ax4.set_ylabel("Response Time")
-
-    # Core assignments
-    cores = [t.assigned_core for t in accepted_tasks]
-    ax5.hist(cores, bins=range(-1, max(cores) + 2), alpha=0.7)
-    ax5.set_title("Core Assignments")
-    ax5.set_xlabel("Core ID")
-    ax5.set_ylabel("Number of Tasks")
-
     # Frequency assignments
     freqs = [t.assigned_frequency for t in accepted_tasks]
-    ax6.hist(freqs, bins=20, alpha=0.7)
-    ax6.set_title("Frequency Assignments")
-    ax6.set_xlabel("Frequency (GHz)")
-    ax6.set_ylabel("Number of Tasks")
+    ax4.hist(freqs, bins=20, alpha=0.7)
+    ax4.set_title("Frequency Assignments")
+    ax4.set_xlabel("Frequency (GHz)")
+    ax4.set_ylabel("Number of Tasks")
 
     os.makedirs(path, exist_ok=True)
     plt.tight_layout()
