@@ -43,3 +43,23 @@ You can see a few samples of the plots, below:
 ![sample](static/16C_1.0U.png)
 
 Also, the scheduled tasks and their details will be saved as a `.csv` file in the same directory.
+
+# Hybrid Scheduling
+We also propose a hybrid scheduling algorithm (hard-deadline periodic + soft-deadline aperiodic). To test the hybrid scheduling algorithm, you can use the following command:
+
+```bash
+python3 run_hybrid_scheduling.py
+```
+Which will result in logging different metrics  and plots like below:
+![sample](static/periodic_schedule.png)
+![sample](static/aperiodic_schedule.png)
+
+
+also if you want to see a sample generated aperiodic set of tasks, run the following command:
+
+```bash
+python3 test_aperiodic.py
+```
+Which will result in a plot like this:
+
+![sample](static/aperiodic_timeline.png)
