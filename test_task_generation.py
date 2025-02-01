@@ -1,8 +1,9 @@
-from utils.task_generator import generate_periodic_tasks
+from utils.task_generator import generate_periodic_tasks, generate_aperiodic_tasks
 from utils.visualization import plot_task_utilizations, print_task_stats, plot_timeline
+import pandas as pd
 
 
-def test_task_generation():
+def test_periodic_task_generation():
     # Test with different utilizations
     enumerator = 0
     for util in [0.4, 0.6, 0.8]:
@@ -16,5 +17,37 @@ def test_task_generation():
         enumerator += 1
 
 
+def test_aperiodic_task_generation():
+    """Test aperiodic task generation"""
+    simulation_length = 1000
+    aperiodic_tasks = generate_aperiodic_tasks(
+        n=20,
+        total_util=0.3,
+        simulation_length=simulation_length,
+    )
+    df = pd.DataFrame(
+        [
+            {
+                "id": task.id,
+                "arrival_time": task.arrival_time,
+                "execution_time": task.execution_time,
+                "soft_deadline": task.soft_deadline,
+                "importance": task.importance,
+            }
+            for task in aperiodic_tasks
+        ]
+    )
+    print("\nGenerated Aperiodic Tasks:")
+    for task in aperiodic_tasks:
+        print(
+            f"Task {task.id}: arrival={task.arrival_time:.1f}, "
+            f"exec={task.execution_time:.1f}, deadline={task.soft_deadline:.1f}, "
+            f"importance={task.importance:.2f}"
+        )
+
+    df.to_csv("aperiodic_tasks.csv", index=False)
+
+
 if __name__ == "__main__":
-    test_task_generation()
+    # test_periodic_task_generation()
+    test_aperiodic_task_generation()
